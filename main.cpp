@@ -25,13 +25,13 @@ void insert(int & trendCount, int8_t source[], int & insertPos, int8_t & trend, 
   }
 }
 
-int compress(int8_t source[], int size)
+int compress(int8_t source[], int data_size)
 {
   int trendCount = 0;       //length of a run of the same value
   int insertPos = 0;        //where to insert compressed data
   int8_t trend = source [0];   //the repeated value in a run
 
-  for(int i = 0; i < size; i++)
+  for(int i = 0; i < data_size; i++)
   {
     if(source[i] == trend) //if we are encountering a run of the same value
     {
@@ -42,34 +42,34 @@ int compress(int8_t source[], int size)
     {
       insert(trendCount, source, insertPos, trend, trend);
     }
-    if ( i == size - 1) //if we reached the end of the array
+    if ( i == data_size - 1) //if we reached the end of the array
     {
       insert(trendCount, source, insertPos, trend, source[i]);
     }
     trend = source[i];  //update trend
   }
 
-  if(insertPos < size) //if we have room at end (most times we will), insert length of original array (as a negative int) at end of our compressed array. This will help with decompression later.
+  if(insertPos < data_size) //if we have room at end (most times we will), insert length of original array (as a negative int) at end of our compressed array. This will help with decompression later.
   {
     int8_t x = -1;
-    insert(size, source, insertPos, x, x); //this -1 is a dummy, we cleave it off the size at the end
+    insert(data_size, source, insertPos, x, x); //this -1 is a dummy, we cleave it off the size at the end
     insertPos--;
   }
   return insertPos;
 }
 
 //takes the compressed array, its size, and where to decompress into (no in place decompression, sorry :p)
-int decompress(int8_t source[], int size, int8_t *& sink)
+int decompress(int8_t * data_ptr, int size, int8_t *& sink)
 {
   int insertPos = 0;
-  int origSize = source[size - 1]; //get the saved length, if it exists
+  int origSize = data_ptr[size - 1]; //get the saved length, if it exists
   if(origSize < 0)
   {
     origSize = 0;
     int i = size - 1;
-    while(source[i] < 0)  // get all the negative numbers at end as length
+    while(data_ptr[i] < 0)  // get all the negative numbers at end as length
     {
-      origSize += -1 * source[i];
+      origSize += -1 * data_ptr[i];
       i--;
       size --;
     }
@@ -83,28 +83,28 @@ int decompress(int8_t source[], int size, int8_t *& sink)
   for(int i = 0; i < size; i++)
   {
 
-    if(source[i] < 0) // if a length
+    if(data_ptr[i] < 0) // if a length
     {
       endOfLength = true;
       int k = i;      //iterator to get actual value of run specified by length
-      while (source[k] < 0)
+      while (data_ptr[k] < 0)
       {
         k++;
       }
-      for(int j = 0; j < source[i] * -1; j++) //fill in length number of value
+      for(int j = 0; j < data_ptr[i] * -1; j++) //fill in length number of value
       {
-        sink[insertPos] = source[k];
+        sink[insertPos] = data_ptr[k];
         insertPos++;
       }
     }
-    if(source[i] >= 0 && endOfLength)     //if we have reached the end of a run
+    if(data_ptr[i] >= 0 && endOfLength)     //if we have reached the end of a run
     {
       endOfLength = false;
       continue;
     }
-    if(source[i] >= 0)        //otherwise, if we encounter a solo value
+    if(data_ptr[i] >= 0)        //otherwise, if we encounter a solo value
     {
-      sink[insertPos] = source[i];
+      sink[insertPos] = data_ptr[i];
       insertPos++;
       endOfLength = false;
     }
@@ -131,7 +131,7 @@ void print(int8_t source[], int size)
   cout << endl;
 }
 int main() {
-  int8_t  data    [91] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+  int8_t  data    [4] = {3,1,1,2};
 
   int size = sizeof(data)/sizeof(data[0]);
   int8_t  verify  [size];
