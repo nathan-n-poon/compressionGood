@@ -25,34 +25,34 @@ void insert(int & trendCount, int8_t source[], int & insertPos, int8_t & trend, 
   }
 }
 
-int compress(int8_t source[], int data_size)
+int compress(int8_t *data_ptr, int data_size)
 {
   int trendCount = 0;       //length of a run of the same value
   int insertPos = 0;        //where to insert compressed data
-  int8_t trend = source [0];   //the repeated value in a run
+  int8_t trend = data_ptr[0];   //the repeated value in a run
 
   for(int i = 0; i < data_size; i++)
   {
-    if(source[i] == trend) //if we are encountering a run of the same value
+    if(data_ptr[i] == trend) //if we are encountering a run of the same value
     {
       trendCount ++;
     }
     
-    if (source[i] != trend) //if a run has ended, by different value
+    if (data_ptr[i] != trend) //if a run has ended, by different value
     {
-      insert(trendCount, source, insertPos, trend, trend);
+      insert(trendCount, data_ptr, insertPos, trend, trend);
     }
     if ( i == data_size - 1) //if we reached the end of the array
     {
-      insert(trendCount, source, insertPos, trend, source[i]);
+      insert(trendCount, data_ptr, insertPos, trend, data_ptr[i]);
     }
-    trend = source[i];  //update trend
+    trend = data_ptr[i];  //update trend
   }
 
   if(insertPos < data_size) //if we have room at end (most times we will), insert length of original array (as a negative int) at end of our compressed array. This will help with decompression later.
   {
     int8_t x = -1;
-    insert(data_size, source, insertPos, x, x); //this -1 is a dummy, we cleave it off the size at the end
+    insert(data_size, data_ptr, insertPos, x, x); //this -1 is a dummy, we cleave it off the size at the end
     insertPos--;
   }
   return insertPos;
