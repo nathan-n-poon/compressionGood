@@ -1,11 +1,13 @@
 #include <iostream>
 #include "RLE.h"
+#include "VERIFIER.h"
 using namespace std;
 
 int main() {
   int8_t  data    [4] = {3,1,1,2};
 
   RLE rle;
+  VERIFIER verifier;
 
   int size = sizeof(data)/sizeof(data[0]);
   int8_t  verify  [size];
@@ -19,11 +21,11 @@ int main() {
   size = rle.compress(data, size);
   float compressedSize = size;
   cout << "compressed data: ";
-  print(data, size);
+  verifier.print(data, size);
   int8_t * sink = data;
   size = rle.decompress(data, size, sink);
   cout << "decompressed: ";
-  print(sink, size);
+  verifier.print(sink, size);
 
   for (int i = 0; i < size; i++)
   {
